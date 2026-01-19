@@ -630,8 +630,8 @@ if $PROGRAM_NAME == __FILE__
   test2 = Page.new(tata)
   test2.is_valid?
 
-  invalid = Html.new([Head.new([Title.new(Text.new("Test"))]),
-      Body.new([Ul.new([H1.new(Text.new("Invalid"))])])]) # Ul 只能包含 Li 元素
-  invalid_test = Page.new(invalid)
-  invalid_test.is_valid?
+  # invalid = Html.new([Head.new([Title.new(Text.new("Test"))]),
+  #     Body.new([Ul.new([H1.new(Text.new("Invalid"))])])]) # Ul 只能包含 Li 元素
+  # invalid_test = Page.new(invalid)
+  # invalid_test.is_valid?
 end

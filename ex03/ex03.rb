@@ -2,7 +2,10 @@
 # frozen_string_literal: true
 # warn_indent: true
 
-# Text 類：表示純文本內容
+# Text class: represents plain text content
+# Subject:
+# A Text class that is constructed with a simple String as a parameter.
+# An overloading of the to_s method.
 class Text
   def initialize(str)
     @content = str
@@ -13,7 +16,14 @@ class Text
   end
 end
 
-# Elem 類：表示 HTML 元素
+# Elem class: represents HTML elements
+# Subject:
+# A Elem class with the following construction parameters: 
+# a tag type,an array of contents, a tag type (orphan or not), 
+# a Hash that allows us to implement’in-tag’ informations (such as src, style, data, etc.).
+
+# An add_content method that adds content to the element.
+# An attr_reader for the tag, content, opt, and tag_type.
 class Elem
   attr_reader :tag, :content, :opt, :tag_type
 
@@ -22,18 +32,18 @@ class Elem
     @tag_type = tag_type
     @opt = opt
     
-    # 處理 content
+    # process content
     if content.is_a?(Array)
       @content = content
     elsif content.nil? || content == ''
       @content = []
     else
-      # 單個元素：存儲為數組，但為了測試兼容性，如果只有一個元素，直接存儲該元素
+      # single element: stored as an array, but for test compatibility, if there is only one element, store it directly
       @content = [content]
     end
   end
   
-  # 為了兼容測試，當 content 只有一個元素時，返回該元素；否則返回數組
+  # for test compatibility, when content has only one element, return the element; otherwise return an array
   def content
     if @content.length == 1
       @content[0]
@@ -52,11 +62,14 @@ class Elem
     end
   end
   
-  # 內部方法：獲取實際的內容數組（用於 to_s）
+  # internal method: get the actual content array (used for to_s)
+  # _before method name is used to indicate that the method is internal and should not be called directly
   def _content_array
     @content
   end
 
+  # overloading of the to_s method
+  # gsub : replace all occurrences of "\n" with "\\n"
   def to_s
     raw = _to_s_raw.gsub("\n", "\\n")
     "\"#{raw}\""
@@ -117,7 +130,7 @@ class Elem
 end
 
 if $PROGRAM_NAME == __FILE__
-  # 測試代碼
+  # test code
   puts "=== 測試 1: 基本創建 ==="
   body = Elem.new('body')
   puts "Tag: #{body.tag}"
@@ -126,15 +139,15 @@ if $PROGRAM_NAME == __FILE__
   puts "Opt: #{body.opt.inspect}"
   puts "to_s: #{body.to_s.inspect}"
   
-  puts "\n=== 測試 2: 簡單標籤 ==="
+  puts "\n=== test 2: simple tags ==="
   img = Elem.new('img', '', 'simple', {'src' => 'http://i.imgur.com/pfp3T.jpg'})
   puts "to_s: #{img.to_s.inspect}"
   
-  puts "\n=== 測試 3: Text 內容 ==="
+  puts "\n=== test 3: Text content ==="
   h1 = Elem.new('h1', Text.new('"Oh no, not again!"'))
   puts "to_s: #{h1.to_s.inspect}"
   
-  puts "\n=== 測試 4: add_content ==="
+  puts "\n=== test 4: add_content ==="
   html = Elem.new('html')
   head = Elem.new('head')
   title = Elem.new('title', Text.new('"Hello ground!"'))

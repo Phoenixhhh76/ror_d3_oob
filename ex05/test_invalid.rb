@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require_relative 'ex05.rb'
+require_relative 'whereto.rb'
 
 puts "=== 測試 1: Html 缺少 Head ==="
 invalid1 = Html.new([Body.new([H1.new(Text.new("Test"))])])

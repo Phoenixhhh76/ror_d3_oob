@@ -6,6 +6,10 @@ rescue LoadError
   # Optional dependency; tests do not rely on it.
 end
 
+# require_relative 'ex03.rb'
+# require 'test/unit'
+# require 'colorize'
+
 class MainTest < Test::Unit::TestCase
   def test_self
     assert_equal(1.to_s, "1" ," Always check your tools ")
