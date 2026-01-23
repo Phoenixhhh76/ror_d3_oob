@@ -2,9 +2,9 @@
 # frozen_string_literal: true
 # warn_indent: true
 
-# ========== 從 ex03 複製的類 ==========
+# ========== Classes copied from ex03 ==========
 
-# Text 類：表示純文本內容
+# Text class: represents plain text content
 class Text
   def initialize(str)
     @content = str
@@ -15,7 +15,7 @@ class Text
   end
 end
 
-# Elem 類：表示 HTML 元素
+# Elem class: represents HTML elements
 class Elem
   attr_reader :tag, :content, :opt, :tag_type
 
@@ -24,7 +24,7 @@ class Elem
     @tag_type = tag_type
     @opt = opt
     
-    # 處理 content
+    # Process content
     if content.is_a?(Array)
       @content = content
     elsif content.nil? || content == ''
@@ -34,7 +34,7 @@ class Elem
     end
   end
   
-  # 為了兼容測試，當 content 只有一個元素時，返回該元素；否則返回數組
+  # For test compatibility: when content has only one element, return the element; otherwise return an array
   def content
     if @content.length == 1
       @content[0]
@@ -53,7 +53,7 @@ class Elem
     end
   end
   
-  # 內部方法：獲取實際的內容數組（用於驗證和 to_s）
+  # Internal method: get the actual content array (used for validation and to_s)
   def _content_array
     @content
   end
@@ -101,7 +101,7 @@ class Elem
   end
 end
 
-# ========== 從 ex04 複製的類 ==========
+# ========== Classes copied from ex04 ==========
 
 class Html < Elem
   def initialize(content = [])
@@ -231,14 +231,14 @@ class Br < Elem
   end
 end
 
-# ========== Page 類：驗證 HTML 結構 ==========
+# ========== Page class: validates HTML structure ==========
 
 class Page
   def initialize(elem)
     @root = elem
     @valid = true
     @errors = []
-    @verbose = true  # 默認輸出驗證過程
+    @verbose = true  # Default: output validation process
   end
 
   def is_valid?(verbose = true)
@@ -246,7 +246,7 @@ class Page
     @valid = true
     @errors = []
     validate_node(@root, true)
-    # 當 verbose = false 且驗證通過時，輸出 "FILE IS OK"
+    # When verbose = false and validation passes, output "FILE IS OK"
     if @valid
       puts "             FILE IS OK"
     else
@@ -257,17 +257,17 @@ class Page
 
   private
 
-  # 輔助方法：只在 verbose 模式下輸出
+  # Helper method: output only in verbose mode
   def verbose_puts(message)
     puts message if @verbose
   end
 
-  # 獲取節點的類名
+  # Get the class name of a node
   def get_node_class_name(node)
     node.class.name
   end
 
-  # 獲取節點的標籤名（用於顯示）
+  # Get the tag name of a node (for display)
   def get_node_tag(node)
     if node.is_a?(Elem)
       node.tag
@@ -278,17 +278,17 @@ class Page
     end
   end
 
-  # 驗證單個節點
+  # Validate a single node
   def validate_node(node, is_root = false, show_evaluating = true, show_validation = true)
     node_class = get_node_class_name(node)
     node_tag = get_node_tag(node)
     
-    # 只在特定節點顯示 "Currently evaluating"
+    # Only show "Currently evaluating" for specific nodes
     if show_evaluating && (is_root || node_class == 'Text' || node_class == 'Img')
       verbose_puts "Currently evaluating a #{node_tag} :"
     end
     
-    # 規則 1: 檢查節點類型是否允許
+    # Rule 1: Check if node type is allowed
     allowed_types = ['Html', 'Head', 'Body', 'Title', 'Meta', 'Img', 'Table', 
                      'Th', 'Tr', 'Td', 'Ul', 'Ol', 'Li', 'H1', 'H2', 'P', 
                      'Div', 'Span', 'Hr', 'Br', 'Text']
@@ -299,7 +299,7 @@ class Page
       return false
     end
     
-    # 根節點必須是 Html
+    # Root node must be Html
     if is_root
       unless node.is_a?(Html)
         @valid = false
@@ -310,7 +310,7 @@ class Page
       verbose_puts "- Html -> Must contains a Head AND a Body after it"
     end
     
-    # 根據節點類型進行特定驗證
+    # Perform specific validation based on node type
     case node_class
     when 'Html'
       validate_html(node, show_validation)
@@ -336,36 +336,36 @@ class Page
       validate_text_node(node, show_validation)
     end
     
-    # 遞歸驗證子節點
+    # Recursively validate child nodes
     if node.is_a?(Elem)
       content_array = node._content_array
       unless content_array.empty?
-        # 顯示 "Evaluating a multiple node" 的條件：
-        # 1. Html 節點的子節點驗證時
-        # 2. Body 節點的子節點驗證時（有多個子節點或子節點不是單個 Text）
-        # 3. 其他節點（除了 Head、Title、H1）：有多個子節點或子節點不是單個 Text
+        # Conditions for showing "Evaluating a multiple node":
+        # 1. When validating Html node's children
+        # 2. When validating Body node's children (has multiple children or child is not a single Text)
+        # 3. Other nodes (except Head, Title, H1): has multiple children or child is not a single Text
         if is_root
-          # Html 節點：檢查是否有 Head 或 Body 等非 Text 子節點
+          # Html node: check if there are non-Text children like Head or Body
           if content_array.any? { |child| !child.is_a?(Text) }
             verbose_puts "Evaluating a multiple node"
           end
         elsif node_class == 'Body'
-          # Body 節點：有多個子節點或子節點不是單個 Text
+          # Body node: has multiple children or child is not a single Text
           if content_array.length > 1 || !content_array[0].is_a?(Text)
             verbose_puts "Evaluating a multiple node"
           end
         elsif node_class != 'Head' && node_class != 'Title' && node_class != 'H1'
-          # 其他節點（除了 Head、Title、H1）：有多個子節點或子節點不是單個 Text
+          # Other nodes (except Head, Title, H1): has multiple children or child is not a single Text
           if content_array.length > 1 || !content_array[0].is_a?(Text)
             verbose_puts "Evaluating a multiple node"
           end
         end
         
         content_array.each do |child|
-          # Head、Title、Body、H1 等節點不顯示 "Currently evaluating" 和驗證信息
+          # Head, Title, Body, H1 nodes don't show "Currently evaluating" and validation messages
           child_class = get_node_class_name(child)
           show_child_evaluating = (child_class == 'Text' || child_class == 'Img')
-          # Head、Title、Body、H1 等節點不顯示驗證信息
+          # Head, Title, Body, H1 nodes don't show validation messages
           show_child_validation = !['Head', 'Title', 'Body', 'H1'].include?(child_class)
           validate_node(child, false, show_child_evaluating, show_child_validation)
         end
@@ -375,7 +375,7 @@ class Page
     true
   end
 
-  # 驗證 Html 節點
+  # Validate Html node
   def validate_html(node, show_validation = true)
     content_array = node._content_array
     head_count = 0
@@ -415,7 +415,7 @@ class Page
     true
   end
 
-  # 驗證 Head 節點
+  # Validate Head node
   def validate_head(node, show_validation = true)
     content_array = node._content_array
     title_count = 0
@@ -435,7 +435,7 @@ class Page
     true
   end
 
-  # 驗證 Body 或 Div 節點
+  # Validate Body or Div node
   def validate_body_or_div(node, show_validation = true)
     allowed_types = ['H1', 'H2', 'Div', 'Table', 'Ul', 'Ol', 'Span', 'Text', 'Img', 'Hr', 'Br']
     content_array = node._content_array
@@ -453,7 +453,7 @@ class Page
     true
   end
 
-  # 驗證只能包含一個 Text 的節點
+  # Validate nodes that can only contain one Text
   def validate_text_only(node, node_tag, show_validation = true)
     content_array = node._content_array
     
@@ -473,7 +473,7 @@ class Page
     true
   end
 
-  # 驗證 P 節點
+  # Validate P node
   def validate_paragraph(node, show_validation = true)
     content_array = node._content_array
     
@@ -489,7 +489,7 @@ class Page
     true
   end
 
-  # 驗證 Span 節點
+  # Validate Span node
   def validate_span(node, show_validation = true)
     allowed_types = ['Text', 'P']
     content_array = node._content_array
@@ -507,7 +507,7 @@ class Page
     true
   end
 
-  # 驗證列表節點（Ul 或 Ol）
+  # Validate list node (Ul or Ol)
   def validate_list(node, node_tag, show_validation = true)
     content_array = node._content_array
     
@@ -529,7 +529,7 @@ class Page
     true
   end
 
-  # 驗證表格行（Tr）
+  # Validate table row (Tr)
   def validate_table_row(node, show_validation = true)
     content_array = node._content_array
     
@@ -564,7 +564,7 @@ class Page
     true
   end
 
-  # 驗證表格（Table）
+  # Validate table (Table)
   def validate_table(node, show_validation = true)
     content_array = node._content_array
     
@@ -580,9 +580,9 @@ class Page
     true
   end
 
-  # 驗證圖片（Img）
+  # Validate image (Img)
   def validate_image(node, show_validation = true)
-    # 檢查 src 屬性（可能是符號或字串鍵）
+    # Check src attribute (may be symbol or string key)
     src_value = node.opt[:src] || node.opt['src']
     
     unless src_value && !src_value.nil?
@@ -601,7 +601,7 @@ class Page
     true
   end
 
-  # 驗證文本節點（Text）
+  # Validate text node (Text)
   def validate_text_node(node, show_validation = true)
     verbose_puts "-Text -> Must contains a simple string" if show_validation
     unless node.is_a?(Text)
@@ -615,7 +615,7 @@ class Page
 end
 
 if $PROGRAM_NAME == __FILE__
-  # 測試代碼：執行題目要求的命令
+  # Test code: execute the command required by the exercise
   toto = Html.new([Head.new([Title.new(Text.new("Hello ground!"))]), 
                    Body.new([H1.new(Text.new("Oh no, not again!")), 
                             Img.new([], {'src' => Text.new('http://i.imgur.com/pfp3T.jpg')})])])
@@ -631,7 +631,7 @@ if $PROGRAM_NAME == __FILE__
   test2.is_valid?
 
   # invalid = Html.new([Head.new([Title.new(Text.new("Test"))]),
-  #     Body.new([Ul.new([H1.new(Text.new("Invalid"))])])]) # Ul 只能包含 Li 元素
+  #     Body.new([Ul.new([H1.new(Text.new("Invalid"))])])]) # Ul can only contain Li elements
   # invalid_test = Page.new(invalid)
   # invalid_test.is_valid?
 end
